@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Слова">
+<meta name="theme-color" content="#0d1525">
+<link rel="apple-touch-icon" href="apple-touch-icon.PNG">
+<link rel="icon" href="apple-touch-icon.PNG">
+<title>Тренажёр голландских слов</title>
+<style>
+:root {
+  color-scheme: dark;
+  --bg:#0d1525; --card:#18243a; --card2:#202f48; --border:#30425e;
+  --primary:#7baaff; --primary-dark:#092044; --text:#f2f5fc; --muted:#aab7cb;
+  --success:#43c98b; --success-bg:#173d34; --danger:#ff707b; --danger-bg:#482631;
+  --input:#202f48; --shadow:0 8px 30px rgba(0,0,0,.12); --nav:rgba(13,21,37,.96);
+  --radius:25px;
+}
+[data-theme="light"] {
+  color-scheme:light;
+  --bg:#f3f6fc; --card:#fff; --card2:#eaf0fa; --border:#d5deed;
+  --primary:#568ce8; --primary-dark:#fff; --text:#17243a; --muted:#65748b;
+  --success:#16885c; --success-bg:#dff5e9; --danger:#d83d50; --danger-bg:#ffeaed;
+  --input:#f0f4fa; --shadow:0 8px 30px rgba(34,54,90,.07); --nav:rgba(243,246,252,.97);
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html{min-height:100%;background:var(--bg);scroll-behavior:smooth}
+body{margin:0;min-height:100vh;font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","Segoe UI",sans-serif;background:var(--bg);color:var(--text);font-size:16px;transition:background .2s,color .2s;padding-bottom:calc(110px + env(safe-area-inset-bottom))}
+button,input,textarea,select{font:inherit}
+button{cursor:pointer;border:0;color:inherit}
+button:disabled{cursor:default;opacity:.5}
+.app{width:100%;max-width:760px;margin:auto;padding:calc(15px + env(safe-area-inset-top)) 18px 30px}
+.header{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:12px 0 36px}
+.brand-title{font-size:25px;font-weight:850;letter-spacing:-.8px}
+.brand-subtitle{margin-top:7px;color:var(--muted);font-size:14px}
+.theme-toggle{width:62px;height:62px;border-radius:21px;background:var(--card2);border:1px solid var(--border);font-size:27px;flex-shrink:0}
+.page-title{font-size:35px;font-weight:850;letter-spacing:-1px;margin:0 0 8px}
+.page-subtitle{color:var(--muted);margin:0 0 25px;line-height:1.5;font-size:16px}
+.page{display:none;animation:appear .2s ease}.page.active{display:block}
+@keyframes appear{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:translateY(0)}}
+.card{background:var(--card);border:1.5px solid var(--border);border-radius:var(--radius);padding:22px;margin-bottom:18px;box-shadow:var(--shadow)}
+.field-label{display:block;font-weight:750;margin-bottom:10px;font-size:15px}
+.field-hint{color:var(--muted);font-size:13px;margin-top:8px;line-height:1.5}
+.input,.textarea{width:100%;padding:16px;border:1.5px solid var(--border);background:var(--input);border-radius:17px;color:var(--text);outline:none;font-size:16px;transition:border .2s,background .2s}
+.input:focus,.textarea:focus{border-color:var(--primary)}
+.textarea{resize:vertical;min-height:190px;line-height:1.7}
+.field-group{margin-bottom:23px}
+.btn{display:flex;justify-content:center;align-items:center;width:100%;min-height:58px;border-radius:19px;padding:14px 18px;background:var(--card2);border:1px solid var(--border);color:var(--text);font-weight:750;font-size:17px;transition:transform .12s,opacity .12s}
+.btn:active{transform:scale(.98)}.btn-primary{background:var(--primary);color:#0b1d38;border-color:transparent}
+.btn-success{background:var(--success-bg);color:var(--success);border-color:var(--success)}
+.btn-danger{background:var(--danger-bg);color:var(--danger);border-color:var(--danger)}
+.btn-small{width:auto;min-height:43px;padding:9px 15px;font-size:14px;border-radius:13px}
+.btn+.btn{margin-top:10px}
+.notice{padding:15px;background:var(--card2);border-radius:15px;color:var(--muted);font-size:14px;line-height:1.6;margin-top:15px}
+.message{display:none;margin-top:14px;padding:14px;border-radius:14px;line-height:1.5;font-size:14px}
+.message.show{display:block}.message.ok{background:var(--success-bg);color:var(--success)}.message.error{background:var(--danger-bg);color:var(--danger)}
+.section-title{font-size:19px;font-weight:800;margin:0 0 15px}
+.theme-chips{display:flex;flex-wrap:wrap;gap:9px}
+.chip{background:var(--card2);border:1.5px solid var(--border);border-radius:30px;padding:11px 16px;font-size:14px;color:var(--muted);font-weight:650;transition:.15s}
+.chip.selected{background:var(--primary);border-color:var(--primary);color:#0b1d38}
+.option-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+.option{padding:15px 10px;border:1.5px solid var(--border);border-radius:15px;background:var(--card2);text-align:center;font-weight:700;min-height:55px;overflow-wrap:anywhere;transition:.15s}
+.option.correct{background:var(--success-bg);border-color:var(--success);color:var(--success)}
+.option.wrong{background:var(--danger-bg);border-color:var(--danger);color:var(--danger)}
+.option.disabled{opacity:.35;pointer-events:none}
+.progress-info{display:flex;justify-content:space-between;gap:10px;color:var(--muted);font-weight:750;margin-bottom:15px;font-size:14px}
+.progress-track{height:9px;border-radius:20px;background:var(--card2);overflow:hidden;margin-bottom:25px}
+.progress-fill{height:100%;background:var(--primary);width:0;border-radius:20px;transition:width .25s}
+.question-card{padding:22px;min-height:370px}
+.question-word{font-size:clamp(28px,7vw,43px);font-weight:850;line-height:1.25;text-align:center;overflow-wrap:anywhere;margin:35px 0;letter-spacing:-.6px}
+.question-hint{color:var(--muted);text-align:center;line-height:1.6;margin-bottom:23px}
+.attempt-info{text-align:center;font-size:14px;font-weight:750;color:var(--danger);min-height:22px;margin:14px 0}
+.answer-input{text-align:center;font-size:20px;font-weight:650;min-height:64px}
+.answer-input.bad{border-color:var(--danger);animation:shake .3s}.answer-input.good{border-color:var(--success);background:var(--success-bg);color:var(--success)}
+@keyframes shake{0%,100%{transform:translateX(0)}20%,60%{transform:translateX(-6px)}40%,80%{transform:translateX(6px)}}
+.answer-status{text-align:center;font-weight:750;min-height:25px;margin:13px 0}
+.answer-status.good{color:var(--success)}.answer-status.bad{color:var(--danger)}
+.exit-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;gap:12px}
+.exit-btn{padding:10px 15px;background:var(--card2);border:1px solid var(--border);border-radius:13px;font-weight:750;color:var(--muted);font-size:14px}
+.audio-button{min-height:62px;font-size:18px;margin-bottom:15px}
+.sentence{font-size:22px;line-height:1.6;font-weight:700;text-align:center;margin:25px 0;overflow-wrap:anywhere}
+.tiles-area{min-height:70px;border:1.5px dashed var(--border);border-radius:17px;padding:12px;display:flex;flex-wrap:wrap;gap:8px;align-content:flex-start;margin-bottom:15px}
+.tile{background:var(--card2);border:1.5px solid var(--border);border-radius:12px;padding:10px 13px;font-size:15px;font-weight:650;color:var(--text);min-height:43px}
+.tile.used{opacity:.3}.tiles-area.good{border-color:var(--success);background:var(--success-bg)}.tiles-area.bad{border-color:var(--danger);background:var(--danger-bg)}
+.result-score{text-align:center;padding:25px 5px}.result-percent{font-size:65px;font-weight:900;letter-spacing:-3px;color:var(--primary)}
+.result-details{font-size:19px;font-weight:750;margin-top:7px}.wrong-list{margin-top:18px}
+.wrong-item{padding:14px 0;border-bottom:1px solid var(--border);line-height:1.5}.wrong-item:last-child{border:0}
+.word-theme{margin-bottom:23px}.word-theme-title{display:flex;justify-content:space-between;gap:10px;align-items:center;padding-bottom:12px;border-bottom:1px solid var(--border);margin-bottom:8px;font-weight:850;font-size:17px}
+.word-count{color:var(--muted);font-size:13px;font-weight:600}
+.word-row{display:flex;justify-content:space-between;gap:12px;padding:11px 2px;border-bottom:1px solid var(--border);font-size:15px;line-height:1.5}
+.word-row:last-child{border-bottom:0}.word-nl{font-weight:750;overflow-wrap:anywhere}.word-ru{color:var(--muted);text-align:right;overflow-wrap:anywhere}
+.empty{text-align:center;color:var(--muted);padding:35px 10px;line-height:1.6}
+.bottom-nav{position:fixed;z-index:50;bottom:0;left:0;right:0;padding:9px 12px calc(9px + env(safe-area-inset-bottom));background:var(--nav);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-top:1px solid var(--border)}
+.nav-inner{display:grid;grid-template-columns:repeat(3,1fr);max-width:650px;margin:auto;gap:7px}
+.nav-item{min-height:70px;border-radius:19px;background:transparent;color:var(--muted);display:flex;flex-direction:column;justify-content:center;align-items:center;gap:5px;font-size:13px;font-weight:750}
+.nav-item.active{background:var(--card2);color:var(--primary)}.nav-icon{font-size:24px;line-height:1}
+.modal-overlay{display:none;position:fixed;inset:0;z-index:100;background:rgba(0,0,0,.65);backdrop-filter:blur(5px);justify-content:center;align-items:center;padding:20px}
+.modal-overlay.show{display:flex}.modal{width:100%;max-width:400px;padding:25px;border-radius:25px;background:var(--card);border:1px solid var(--border);box-shadow:var(--shadow);animation:appear .2s}
+.modal h2{margin:0 0 10px;font-size:23px}.modal p{color:var(--muted);line-height:1.5;margin:0 0 20px}.modal .btn+.btn{margin-top:9px}
+.hidden{display:none!important}.api-progress{margin-top:14px;color:var(--muted);font-size:14px;line-height:1.6}
+@media(min-width:600px){.app{padding-left:25px;padding-right:25px}.question-card{padding:30px}}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;transition-duration:.01ms!important}}
+</style>
+</head>
+<body>
+<div class="app">
+<header class="header">
+  <div><div class="brand-title">🇳🇱 Тренажёр слов</div><div class="brand-subtitle">Учите голландский в своём темпе</div></div>
+  <button class="theme-toggle" id="themeToggle" aria-label="Сменить тему">☀️</button>
+</header>
+
+<section class="page active" id="page-practice">
+  <h1 class="page-title">Практика</h1><p class="page-subtitle">Выберите темы и режим тренировки.</p>
+  <div id="practiceSetup">
+    <div class="card"><div class="section-title">Темы для изучения</div><div class="theme-chips" id="practiceThemes"></div><div class="field-hint">Можно выбрать несколько тем одновременно.</div></div>
+    <div class="card">
+      <div class="field-group"><label class="field-label" for="questionCount">Количество вопросов</label><select class="input" id="questionCount"><option value="5">5 вопросов</option><option value="10" selected>10 вопросов</option><option value="15">15 вопросов</option><option value="20">20 вопросов</option></select></div>
+      <div class="field-group"><label class="field-label" for="practiceMode">Режим тренировки</label><select class="input" id="practiceMode"><option value="mix">🎲 Микс</option><option value="quiz">📝 Квиз — выбор из 4</option><option value="write">✍️ Написать</option><option value="audio">🎧 Написать на слух</option><option value="sentence">💬 Предложения: перевод</option><option value="blank">🔤 Предложения: пропуск слова</option></select></div>
+      <button class="btn btn-primary" id="startPractice">Начать тренировку →</button><div class="message error" id="practiceError"></div>
+    </div>
+  </div>
+  <div id="practiceSession" class="hidden">
+    <div class="exit-top"><button class="exit-btn" id="exitButton">✕ Выйти</button><span id="sessionMode" class="word-count"></span></div>
+    <div class="card question-card">
+      <div class="progress-info"><span id="questionNumber">Вопрос 1/10</span><span id="correctCount">0 верно</span></div>
+      <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
+      <div id="questionContent"></div>
+    </div>
+  </div>
+  <div id="practiceResult" class="hidden">
+    <div class="card"><div class="result-score"><div class="result-percent" id="resultPercent">0%</div><div class="result-details" id="resultDetails">Правильно 0 из 0</div></div>
+      <div class="section-title">Слова для повторения</div><div id="wrongWords" class="wrong-list"></div>
+      <button class="btn btn-primary" id="retryButton">↻ Ещё раз</button><button class="btn" id="backThemesButton">К темам</button>
+    </div>
+  </div>
+</section>
+
+<section class="page" id="page-words"><h1 class="page-title">Слова</h1><p class="page-subtitle">Ваш словарь голландских слов.</p><div id="wordList"></div></section>
+
+<section class="page" id="page-add">
+  <h1 class="page-title">Добавить</h1><p class="page-subtitle">Добавляйте новые слова и примеры предложений.</p>
+  <div class="card">
+    <div class="field-group"><label class="field-label" for="themeInput">Тема</label><input class="input" id="themeInput" type="text" placeholder="Например, Урок 1" list="themeSuggestions"><datalist id="themeSuggestions"></datalist><div class="field-hint">Введите название новой темы или выберите существующую.</div></div>
+    <div class="field-group"><label class="field-label" for="wordsInput">Голландские слова</label><textarea class="textarea" id="wordsInput" placeholder="de aansluiting&#10;behangen&#10;de binnenkant&#10;de eigenaar"></textarea><div class="field-hint">Одно слово на строку. Перевод добавится автоматически из ответа ChatGPT.</div></div>
+    <button class="btn btn-primary" id="copyPrompt">📋 Скопировать запрос для ChatGPT</button><div class="message" id="copyMessage"></div>
+  </div>
+  <div class="card"><div class="section-title">Вставьте ответ ChatGPT</div><textarea class="textarea" id="jsonInput" placeholder="Вставьте сюда JSON-массив с переводами и примерами предложений..."></textarea><button class="btn btn-primary" id="importButton" style="margin-top:15px">ОК — добавить слова</button><div class="message" id="importMessage"></div></div>
+  <div class="card"><div class="section-title">⚡ Автоматический режим</div>
+    <div class="field-group"><label class="field-label" for="apiKey">OpenAI API Key</label><input class="input" id="apiKey" type="password" placeholder="sk-..." autocomplete="off"><div class="field-hint">Ключ сохраняется только в localStorage этого браузера на данном устройстве. Он используется для прямых запросов к OpenAI API. Не используйте этот способ на публичном сайте: посетители смогут получить доступ к ключу. API оплачивается отдельно согласно тарифам OpenAI.</div></div>
+    <button class="btn btn-primary" id="autoImportButton">⚡ Обработать автоматически</button><div class="api-progress" id="apiProgress"></div>
+  </div>
+</section>
+</div>
+
+<nav class="bottom-nav"><div class="nav-inner">
+  <button class="nav-item active" data-page="practice"><span class="nav-icon">✦</span><span>Практика</span></button>
+  <button class="nav-item" data-page="words"><span class="nav-icon">▤</span><span>Слова</span></button>
+  <button class="nav-item" data-page="add"><span class="nav-icon">＋</span><span>Добавить</span></button>
+</div></nav>
+
+<div class="modal-overlay" id="exitModal"><div class="modal"><h2>Остановить тренировку?</h2><p>Вы можете продолжить или завершить тренировку прямо сейчас.</p><button class="btn btn-primary" id="continueButton">Продолжить</button><button class="btn btn-success" id="finishButton">Завершить и показать результат</button><button class="btn btn-danger" id="quitButton">Выйти без результата</button></div></div>
+
+<script>
+"use strict";
+const STORAGE_KEY="dutchTrainerData_v1",THEME_KEY="dutchTrainerTheme_v1",API_KEY="dutchTrainerApiKey_v1";
+let words=[],storageAvailable=true;
+function loadStorage(){try{const raw=localStorage.getItem(STORAGE_KEY);if(raw){const parsed=JSON.parse(raw);if(Array.isArray(parsed))words=parsed;}}catch(e){storageAvailable=false;console.warn("Ошибка чтения localStorage",e);}}
+function saveStorage(){try{localStorage.setItem(STORAGE_KEY,JSON.stringify(words));storageAvailable=true;return true;}catch(e){storageAvailable=false;console.error("Ошибка сохранения",e);return false;}}
+function loadPreference(key,fallback){try{return localStorage.getItem(key)||fallback;}catch(e){return fallback;}}
+function savePreference(key,value){try{localStorage.setItem(key,value);}catch(e){console.warn("Не удалось сохранить настройку",e);}}
+loadStorage();
+const $=id=>document.getElementById(id);
+function escapeHTML(value){return String(value??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[c]));}
+function shuffle(array){const result=[...array];for(let i=result.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[result[i],result[j]]=[result[j],result[i]];}return result;}
+function randomItem(array){return array[Math.floor(Math.random()*array.length)];}
+function unique(array){return [...new Set(array)];}
+function getThemes(){return unique(words.map(w=>w.theme).filter(Boolean)).sort((a,b)=>a.localeCompare(b,"ru"));}
+function getWordsForThemes(themes){return words.filter(w=>themes.includes(w.theme));}
+function normalizeText(text){return String(text??"").toLocaleLowerCase().replace(/ё/g,"е").normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/[.,!?;:()[\]{}"'«»„“”‘’]/g,"").replace(/\s+/g," ").trim();}
+function normalizeDutch(text){return normalizeText(text).replace(/^(de|het|een)\s+/i,"").replace(/[-–—]/g," ").replace(/\s+/g," ").trim();}
+function isCorrectDutch(input,expected){return normalizeDutch(input)===normalizeDutch(expected);}
+function isCorrectRussian(input,expected){return String(expected).split(/[,/;]/).map(x=>normalizeText(x)).filter(Boolean).includes(normalizeText(input));}
+function showMessage(element,text,type){element.textContent=text;element.className="message show "+type;}
+function clearMessage(element){element.textContent="";element.className="message";}
+function makeId(){return "w_"+Date.now().toString(36)+"_"+Math.random().toString(36).slice(2,9);}
+
+function setTheme(theme){document.documentElement.dataset.theme=theme;$("themeToggle").textContent=theme==="dark"?"☀️":"🌙";savePreference(THEME_KEY,theme);}
+setTheme(loadPreference(THEME_KEY,window.matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light"));
+$("themeToggle").addEventListener("click",()=>setTheme(document.documentElement.dataset.theme==="dark"?"light":"dark"));
+function showPage(name){document.querySelectorAll(".page").forEach(page=>page.classList.toggle("active",page.id==="page-"+name));document.querySelectorAll(".nav-item").forEach(btn=>btn.classList.toggle("active",btn.dataset.page===name));if(name==="words")renderWords();if(name==="practice")renderPracticeThemes();if(name==="add")renderThemeSuggestions();window.scrollTo({top:0,behavior:"smooth"});}
+document.querySelectorAll(".nav-item").forEach(button=>button.addEventListener("click",()=>showPage(button.dataset.page)));
+
+function renderWords(){const container=$("wordList"),themes=getThemes();if(!words.length){container.innerHTML='<div class="card empty">Пока нет слов.<br>Перейдите во вкладку «Добавить», чтобы создать свой словарь.</div>';return;}container.innerHTML=themes.map(theme=>{const group=words.filter(w=>w.theme===theme);return `<div class="card word-theme"><div class="word-theme-title"><span>${escapeHTML(theme)}</span><span class="word-count">${group.length} слов</span></div>${group.map(w=>`<div class="word-row"><span class="word-nl">${escapeHTML(w.nl)}</span><span class="word-ru">${escapeHTML(w.ru)}</span></div>`).join("")}</div>`;}).join("");}
+function renderThemeSuggestions(){$("themeSuggestions").innerHTML=getThemes().map(t=>`<option value="${escapeHTML(t)}"></option>`).join("");}
+
+function getInputWords(){return unique($("wordsInput").value.split(/\r?\n/).map(s=>s.trim()).filter(Boolean));}
+function buildPrompt(list){return `Ты помощник для изучающего голландский язык (уровень A1-A2), родной язык русский. Для каждого слова из списка верни ТОЛЬКО JSON-массив в одном блоке кода. Без пояснений, без заголовков, не пиши программ, не создавай файлов и canvas, просто текст ответа. Формат элемента: {"nl": "слово как дано", "ru": "краткий перевод, 1-3 слова", "sentences": [ровно 5 РАЗНЫХ простых голландских предложений по 4-10 слов, каждое содержит это слово в исходной форме, в разных ситуациях и с разными конструкциями; каждое в виде {"s": "голландское предложение", "sr": "точный перевод на русский"}]}. Порядок как в списке. Слова: ${list.join(", ")}`;}
+$("copyPrompt").addEventListener("click",async()=>{const list=getInputWords(),message=$("copyMessage");if(!list.length){showMessage(message,"Сначала введите хотя бы одно голландское слово.","error");return;}const prompt=buildPrompt(list);try{await navigator.clipboard.writeText(prompt);showMessage(message,"✓ Запрос скопирован. Теперь отправьте его в ChatGPT.","ok");}catch(e){const helper=document.createElement("textarea");helper.value=prompt;document.body.appendChild(helper);helper.select();try{document.execCommand("copy");showMessage(message,"✓ Запрос скопирован.","ok");}catch(err){showMessage(message,"Не удалось скопировать. Попробуйте выделить текст вручную.","error");}helper.remove();}});
+function extractJSON(text){const start=text.indexOf("["),end=text.lastIndexOf("]");if(start===-1||end===-1||end<start)throw new Error("Не найден JSON-массив. Проверьте ответ ChatGPT.");try{return JSON.parse(text.slice(start,end+1));}catch(e){throw new Error("JSON повреждён. Скопируйте полный ответ ChatGPT без изменений.");}}
+function validateWord(item){if(!item||typeof item!=="object")return null;const nl=String(item.nl||"").trim(),ru=String(item.ru||"").trim(),sentences=item.sentences;if(!nl||!ru||!Array.isArray(sentences)||sentences.length!==5)return null;const cleanSentences=[];for(const sentence of sentences){if(!sentence||typeof sentence.s!=="string"||typeof sentence.sr!=="string"||!sentence.s.trim()||!sentence.sr.trim())return null;cleanSentences.push({s:sentence.s.trim(),sr:sentence.sr.trim()});}return {nl,ru,sentences:cleanSentences};}
+function addImportedWords(items,theme){let added=0,duplicates=0;const existing=new Set(words.filter(w=>w.theme===theme).map(w=>normalizeDutch(w.nl)));for(const item of items){const valid=validateWord(item);if(!valid)continue;const normalized=normalizeDutch(valid.nl);if(existing.has(normalized)){duplicates++;continue;}words.push({id:makeId(),theme,nl:valid.nl,ru:valid.ru,sentences:valid.sentences,used:[]});existing.add(normalized);added++;}if(added)saveStorage();renderWords();renderPracticeThemes();renderThemeSuggestions();return {added,duplicates};}
+function importManual(text){const theme=$("themeInput").value.trim();if(!theme)throw new Error("Укажите тему.");if(!text.trim())throw new Error("Вставьте ответ ChatGPT.");const data=extractJSON(text);if(!Array.isArray(data))throw new Error("Ожидается JSON-массив.");if(!data.length)throw new Error("Массив пуст.");const valid=data.map(validateWord).filter(Boolean);if(!valid.length)throw new Error("Нет корректных слов. У каждого слова должно быть 5 предложений с переводами.");const result=addImportedWords(valid,theme);if(!result.added)return `Новых слов не добавлено. Дубликатов: ${result.duplicates}.`;return `✓ Добавлено: ${result.added}. Пропущено дубликатов: ${result.duplicates}.`;}
+$("importButton").addEventListener("click",()=>{const message=$("importMessage");try{showMessage(message,importManual($("jsonInput").value),"ok");}catch(e){showMessage(message,e.message,"error");}});
+
+$("apiKey").value=loadPreference(API_KEY,"");
+$("apiKey").addEventListener("change",()=>savePreference(API_KEY,$("apiKey").value.trim()));
+function buildAPIRequest(wordsBatch){return `Ты помощник для изучающего голландский язык A1-A2, родной язык русский.\nДля каждого слова создай краткий перевод на русский (1-3 слова), ровно 5 разных простых голландских предложений по 4-10 слов, каждое содержит исходное слово в исходной форме; используй разные ситуации и конструкции, дай точный русский перевод каждого предложения.\nВерни только JSON-объект структуры {"words":[{"nl":"слово как дано","ru":"краткий перевод","sentences":[{"s":"голландское предложение","sr":"русский перевод"},{"s":"...","sr":"..."},{"s":"...","sr":"..."},{"s":"...","sr":"..."},{"s":"...","sr":"..."}]}]}. Сохраняй исходное написание и порядок списка.\nСлова:\n${wordsBatch.join("\n")}`;}
+async function generateWithAPI(batch,apiKey){const response=await fetch("https://api.openai.com/v1/chat/completions",{method:"POST",headers:{"Content-Type":"application/json","Authorization":"Bearer "+apiKey},body:JSON.stringify({model:"gpt-4o-mini",response_format:{type:"json_object"},messages:[{role:"system",content:"Ты помощник по изучению голландского языка. Всегда возвращай корректный JSON."},{role:"user",content:buildAPIRequest(batch)}],temperature:.7})});if(!response.ok){const errorData=await response.json().catch(()=>({}));throw new Error(errorData.error?.message||`Ошибка API: HTTP ${response.status}`);}const data=await response.json(),content=data.choices?.[0]?.message?.content;if(!content)throw new Error("API вернул пустой ответ.");const parsed=JSON.parse(content);if(!Array.isArray(parsed.words))throw new Error("API не вернул массив words.");return parsed.words;}
+$("autoImportButton").addEventListener("click",async()=>{const theme=$("themeInput").value.trim(),list=getInputWords(),apiKey=$("apiKey").value.trim(),progress=$("apiProgress"),button=$("autoImportButton");if(!theme){progress.textContent="Ошибка: укажите тему.";return;}if(!list.length){progress.textContent="Ошибка: введите слова.";return;}if(!apiKey){progress.textContent="Введите OpenAI API Key.";return;}if(button.disabled)return;savePreference(API_KEY,apiKey);button.disabled=true;let totalAdded=0,totalDuplicates=0,failed=false;const batches=[];for(let i=0;i<list.length;i+=10)batches.push(list.slice(i,i+10));try{for(let i=0;i<batches.length;i++){progress.textContent=`Обработка пачки ${i+1} из ${batches.length}...`;const generated=await generateWithAPI(batches[i],apiKey),valid=generated.map(validateWord).filter(Boolean);if(!valid.length)throw new Error(`Пачка ${i+1}: API вернул некорректные данные.`);const result=addImportedWords(valid,theme);totalAdded+=result.added;totalDuplicates+=result.duplicates;progress.textContent=`Пачка ${i+1}/${batches.length} сохранена. Добавлено: ${totalAdded}.`; }progress.textContent=`✓ Готово! Добавлено ${totalAdded} слов. Дубликатов: ${totalDuplicates}.`;}catch(e){failed=true;progress.textContent=`Ошибка: ${e.message}\n\nУже сохранённые слова не потеряны. Можно продолжить вручную: скопируйте запрос и вставьте ответ ChatGPT в поле выше.`;}finally{button.disabled=false;}if(!failed){renderWords();renderPracticeThemes();}});
+
+let selectedThemes=[],session=null,currentQuestion=null,sessionSentenceUsed=new Map();
+function renderPracticeThemes(){const container=$("practiceThemes"),themes=getThemes();selectedThemes=selectedThemes.filter(t=>themes.includes(t));if(!themes.length){container.innerHTML='<div class="empty" style="width:100%">Слов пока нет. Добавьте слова во вкладке «Добавить».</div>';return;}if(!selectedThemes.length)selectedThemes=[...themes];container.innerHTML=themes.map(theme=>`<button class="chip ${selectedThemes.includes(theme)?"selected":""}" data-theme="${escapeHTML(theme)}">${escapeHTML(theme)} ${selectedThemes.includes(theme)?"✓":""}</button>`).join("");container.querySelectorAll(".chip").forEach(button=>button.addEventListener("click",()=>{const theme=button.dataset.theme;if(selectedThemes.includes(theme))selectedThemes=selectedThemes.filter(t=>t!==theme);else selectedThemes.push(theme);renderPracticeThemes();}));}
+const MODE_NAMES={mix:"Микс",quiz:"Квиз",write:"Написать",audio:"На слух",sentence:"Предложения",blank:"Пропуск слова"};
+$("startPractice").addEventListener("click",startPractice);
+function startPractice(){const pool=getWordsForThemes(selectedThemes),error=$("practiceError");clearMessage(error);if(!selectedThemes.length||!pool.length){showMessage(error,"Выберите хотя бы одну тему со словами.","error");return;}if(pool.length<4){showMessage(error,"Для тренировки нужно минимум 4 слова в выбранных темах.","error");return;}session={pool,count:Number($("questionCount").value),mode:$("practiceMode").value,index:0,correct:0,answered:0,mistakes:[],completed:false};sessionSentenceUsed=new Map();$("practiceSetup").classList.add("hidden");$("practiceResult").classList.add("hidden");$("practiceSession").classList.remove("hidden");$("sessionMode").textContent=MODE_NAMES[session.mode];nextQuestion();}
+function getQuestionType(mode){if(mode==="quiz")return randomItem(["mcNL","mcRU"]);if(mode==="write")return randomItem(["inputNL","inputRU"]);if(mode==="audio")return "audio";if(mode==="sentence")return randomItem(["sentenceNL","sentenceRU"]);if(mode==="blank")return "blank";return randomItem(["mcNL","mcRU","inputNL","inputRU","audio","sentenceNL","sentenceRU","blank"]);}
+function getRandomWord(){return randomItem(session.pool);}
+function getUnusedSentence(word){let usedThisSession=sessionSentenceUsed.get(word.id)||[],available=word.sentences.map((s,i)=>({...s,index:i})).filter(s=>!usedThisSession.includes(s.index));if(!available.length){const otherWords=session.pool.filter(w=>w.sentences.some((s,i)=>!(sessionSentenceUsed.get(w.id)||[]).includes(i)));if(otherWords.length){word=randomItem(otherWords);available=word.sentences.map((s,i)=>({...s,index:i})).filter(s=>!(sessionSentenceUsed.get(word.id)||[]).includes(s.index));}}if(!available.length)return {word,sentence:word.sentences[0],index:0};const selected=randomItem(available);sessionSentenceUsed.set(word.id,[...usedThisSession,selected.index]);if(!Array.isArray(word.used))word.used=[];if(!word.used.includes(selected.index))word.used.push(selected.index);if(word.used.length>=word.sentences.length)word.used=[];saveStorage();return {word,sentence:selected,index:selected.index};}
+function makeQuestion(){let type=getQuestionType(session.mode),word=getRandomWord();const q={type,word,attempts:0,finished:false,failedOptions:[],selectedTiles:[],wrong:false};if(["sentenceNL","sentenceRU","blank"].includes(type)){const result=getUnusedSentence(word);word=result.word;q.word=word;q.sentence=result.sentence;if(!q.sentence)q.type="inputNL";}
+if(q.type==="mcNL"){q.prompt=word.nl;q.correctAnswer=word.ru;q.direction="NL → RU";q.options=buildOptions(word,"ru");}
+if(q.type==="mcRU"){q.prompt=word.ru;q.correctAnswer=word.nl;q.direction="RU → NL";q.options=buildOptions(word,"nl");}
+if(q.type==="inputNL"){q.prompt=word.ru;q.correctAnswer=word.nl;q.direction="RU → NL";}
+if(q.type==="inputRU"){q.prompt=word.nl;q.correctAnswer=word.ru;q.direction="NL → RU";}
+if(q.type==="audio"){q.prompt=word.nl;q.correctAnswer=word.nl;q.direction="Аудио";}
+if(q.type==="sentenceNL"){q.direction="NL → RU";q.prompt=q.sentence.s;q.correctAnswer=q.sentence.sr;q.tiles=createTiles(q.sentence.sr);}
+if(q.type==="sentenceRU"){q.direction="RU → NL";q.prompt=q.sentence.sr;q.correctAnswer=q.sentence.s;q.tiles=createTiles(q.sentence.s);}
+if(q.type==="blank"){q.direction="Пропуск слова";const sentence=q.sentence.s,escaped=q.word.nl.replace(/[.*+?^${}()|[\]\\]/g,"\\$&"),regex=new RegExp(escaped,"i");if(!regex.test(sentence)){q.type="inputNL";q.prompt=q.word.ru;q.correctAnswer=q.word.nl;return q;}q.prompt=sentence.replace(regex,"_____");q.correctAnswer=q.word.nl;}
+return q;}
+function buildOptions(word,field){const correct=word[field],candidates=session.pool.filter(w=>w.id!==word.id).map(w=>w[field]),correctNorm=normalizeText(correct),ranked=candidates.filter(v=>normalizeText(v)!==correctNorm).sort((a,b)=>{const score=value=>(normalizeText(value)[0]===correctNorm[0]?0:1)*100+Math.abs(value.length-correct.length);return score(a)-score(b);}),result=[correct];for(const value of ranked){if(!result.some(x=>normalizeText(x)===normalizeText(value)))result.push(value);if(result.length===4)break;}while(result.length<4){const other=randomItem(session.pool),value=other[field];if(!result.some(x=>normalizeText(x)===normalizeText(value)))result.push(value);else break;}return shuffle(result);}
+function createTiles(sentence){return shuffle((sentence.match(/\S+/g)||[]).map((text,i)=>({id:"tile_"+i+"_"+Math.random().toString(36).slice(2,6),text,index:i})));}
+function nextQuestion(){if(!session)return;if(session.index>=session.count){showResults();return;}currentQuestion=makeQuestion();renderQuestion();}
+function renderQuestion(){const q=currentQuestion,container=$("questionContent");$("questionNumber").textContent=`Вопрос ${session.index+1}/${session.count}`;$("correctCount").textContent=`${session.correct} верно`;$("progressFill").style.width=`${session.index/session.count*100}%`;let html="";
+if(q.type==="mcNL"||q.type==="mcRU"){html=`<div class="question-hint">${q.direction} · Выберите правильный вариант</div><div class="question-word">${escapeHTML(q.prompt)}</div><div class="option-grid">${q.options.map((option,i)=>`<button class="option" data-option="${i}">${escapeHTML(option)}</button>`).join("")}</div><div class="attempt-info" id="attemptInfo"></div><div class="answer-status" id="answerStatus"></div><button class="btn btn-primary hidden" id="nextQuestionButton">Дальше →</button>`;}
+if(["inputNL","inputRU","audio","blank"].includes(q.type)){let prompt=q.type==="audio"?"🎧 Слушайте и напишите":q.prompt,hint=q.type==="audio"?"Нажмите «Повторить звук», чтобы услышать слово":q.type==="blank"?`Перевод слова: ${q.word.ru}`:q.direction==="RU → NL"?"Напишите слово по-голландски":"Напишите перевод по-русски";html=`<div class="question-hint">${q.direction}</div><div class="question-word">${escapeHTML(prompt)}</div><div class="question-hint">${escapeHTML(hint)}</div>${q.type==="audio"?'<button class="btn audio-button" id="repeatAudio">🔊 Повторить звук</button>':""}<input class="input answer-input" id="answerInput" type="text" autocomplete="off" autocapitalize="none" placeholder="${q.type==="blank"?"Введите пропущенное слово":"Ваш ответ"}"><div class="attempt-info" id="attemptInfo"></div><div class="answer-status" id="answerStatus"></div><button class="btn btn-primary" id="checkAnswer">Проверить</button><button class="btn btn-primary hidden" id="nextQuestionButton">Дальше →</button>`;}
+if(q.type==="sentenceNL"||q.type==="sentenceRU"){html=`<div class="question-hint">${q.direction} · Соберите предложение</div><div class="sentence">${escapeHTML(q.prompt)}</div><div class="field-label">Ваш ответ:</div><div class="tiles-area" id="answerTiles"></div><div class="field-label">Слова:</div><div class="tiles-area" id="availableTiles"></div><div class="attempt-info" id="attemptInfo"></div><div class="answer-status" id="answerStatus"></div><button class="btn btn-primary" id="checkAnswer">Проверить</button><button class="btn btn-primary hidden" id="nextQuestionButton">Дальше →</button>`;}
+container.innerHTML=html;if(q.type==="mcNL"||q.type==="mcRU")bindMultipleChoice();if(["inputNL","inputRU","audio","blank"].includes(q.type))bindInputQuestion();if(q.type==="sentenceNL"||q.type==="sentenceRU"){bindSentenceQuestion();renderTiles();}if(q.type==="audio")speak(q.word.nl);}
+function speak(text){if(!("speechSynthesis"in window))return;try{speechSynthesis.cancel();const utterance=new SpeechSynthesisUtterance(text);utterance.lang="nl-NL";utterance.rate=.9;const voice=speechSynthesis.getVoices().find(v=>v.lang.toLowerCase().startsWith("nl"));if(voice)utterance.voice=voice;speechSynthesis.speak(utterance);}catch(e){console.warn("Озвучка недоступна",e);}}
+function updateAttemptInfo(){const el=$("attemptInfo");if(el&&currentQuestion.attempts>0&&!currentQuestion.finished)el.textContent=`Попытка ${currentQuestion.attempts+1} из 3`;}
+function handleWrongAnswer(){const q=currentQuestion;q.attempts++;q.wrong=true;if(q.attempts>=3){finishQuestion(false);return;}updateAttemptInfo();const status=$("answerStatus");if(status){status.textContent="Неверно. Попробуйте ещё раз.";status.className="answer-status bad";}}
+function finishQuestion(correct){const q=currentQuestion;if(q.finished)return;q.finished=true;session.answered++;if(correct)session.correct++;else session.mistakes.push({nl:q.word.nl,ru:q.word.ru});$("correctCount").textContent=`${session.correct} верно`;const status=$("answerStatus");if(status){status.textContent=correct?"✓ Правильно!":`Правильный ответ: ${q.correctAnswer}`;status.className="answer-status good";}const input=$("answerInput");if(input){input.disabled=true;input.classList.remove("bad");input.classList.add("good");if(!correct)input.value=q.correctAnswer;}const check=$("checkAnswer");if(check)check.classList.add("hidden");
+if(q.type==="mcNL"||q.type==="mcRU"){document.querySelectorAll(".option").forEach(button=>{const value=q.options[Number(button.dataset.option)];button.disabled=true;if(normalizeText(value)===normalizeText(q.correctAnswer))button.classList.add("correct");});}
+if(q.type==="sentenceNL"||q.type==="sentenceRU"){const area=$("answerTiles");if(area){area.classList.remove("bad");area.classList.add("good");}}
+$("nextQuestionButton").classList.remove("hidden");if(["sentenceNL","sentenceRU","blank"].includes(q.type))speak(q.sentence.s);else speak(q.word.nl);}
+function bindMultipleChoice(){document.querySelectorAll(".option").forEach(button=>button.addEventListener("click",()=>{const q=currentQuestion;if(q.finished||button.disabled)return;const selected=q.options[Number(button.dataset.option)];if(normalizeText(selected)===normalizeText(q.correctAnswer)){button.classList.add("correct");finishQuestion(true);}else{button.classList.add("wrong");button.disabled=true;q.failedOptions.push(Number(button.dataset.option));handleWrongAnswer();}}));$("nextQuestionButton").addEventListener("click",nextQuestion);}
+function checkInputAnswer(){const q=currentQuestion;if(q.finished)return;const input=$("answerInput"),value=input.value.trim();if(!value){input.focus();return;}const correct=["inputNL","audio","blank"].includes(q.type)?isCorrectDutch(value,q.correctAnswer):isCorrectRussian(value,q.correctAnswer);if(correct)finishQuestion(true);else{input.classList.remove("bad");void input.offsetWidth;input.classList.add("bad");handleWrongAnswer();if(!q.finished)setTimeout(()=>{input.focus();try{input.setSelectionRange(input.value.length,input.value.length);}catch(e){}},50);}}
+function bindInputQuestion(){const input=$("answerInput");$("checkAnswer").addEventListener("click",checkInputAnswer);input.addEventListener("keydown",event=>{if(event.key==="Enter"){event.preventDefault();if(!currentQuestion.finished)checkInputAnswer();}});if(currentQuestion.type==="audio")$("repeatAudio").addEventListener("click",()=>speak(currentQuestion.word.nl));$("nextQuestionButton").addEventListener("click",nextQuestion);if(currentQuestion.type!=="audio")setTimeout(()=>input.focus(),100);}
+function renderTiles(){const q=currentQuestion,answerArea=$("answerTiles"),availableArea=$("availableTiles");if(!answerArea||!availableArea)return;answerArea.innerHTML=q.selectedTiles.map(tile=>`<button class="tile" data-tile="${escapeHTML(tile.id)}" ${q.finished?"disabled":""}>${escapeHTML(tile.text)}</button>`).join("");availableArea.innerHTML=q.tiles.filter(tile=>!q.selectedTiles.some(s=>s.id===tile.id)).map(tile=>`<button class="tile" data-tile="${escapeHTML(tile.id)}" ${q.finished?"disabled":""}>${escapeHTML(tile.text)}</button>`).join("");answerArea.querySelectorAll(".tile").forEach(button=>button.addEventListener("click",()=>{if(q.finished)return;const index=q.selectedTiles.findIndex(t=>t.id===button.dataset.tile);if(index!==-1){q.selectedTiles.splice(index,1);answerArea.classList.remove("bad");renderTiles();}}));availableArea.querySelectorAll(".tile").forEach(button=>button.addEventListener("click",()=>{if(q.finished)return;const tile=q.tiles.find(t=>t.id===button.dataset.tile);if(tile&&!q.selectedTiles.some(t=>t.id===tile.id)){q.selectedTiles.push(tile);answerArea.classList.remove("bad");renderTiles();}}));}
+function normalizeSentence(text){return String(text).toLocaleLowerCase().replace(/ё/g,"е").replace(/[.,!?;:()[\]{}"'«»„“”]/g,"").replace(/\s+/g," ").trim();}
+function checkSentence(){const q=currentQuestion;if(q.finished)return;const answer=q.selectedTiles.map(t=>t.text).join(" ");if(normalizeSentence(answer)===normalizeSentence(q.correctAnswer))finishQuestion(true);else{$("answerTiles").classList.remove("bad");void $("answerTiles").offsetWidth;$("answerTiles").classList.add("bad");handleWrongAnswer();}}
+function bindSentenceQuestion(){$("checkAnswer").addEventListener("click",checkSentence);$("nextQuestionButton").addEventListener("click",nextQuestion);}
+
+$("exitButton").addEventListener("click",()=>$("exitModal").classList.add("show"));
+$("continueButton").addEventListener("click",()=>$("exitModal").classList.remove("show"));
+$("finishButton").addEventListener("click",()=>{$("exitModal").classList.remove("show");showResults();});
+$("quitButton").addEventListener("click",()=>{$("exitModal").classList.remove("show");stopSpeech();session=null;currentQuestion=null;$("practiceSession").classList.add("hidden");$("practiceResult").classList.add("hidden");$("practiceSetup").classList.remove("hidden");$("progressFill").style.width="0%";});
+$("exitModal").addEventListener("click",event=>{if(event.target===$("exitModal"))$("exitModal").classList.remove("show");});
+function stopSpeech(){if("speechSynthesis"in window)speechSynthesis.cancel();}
+function showResults(){if(!session)return;stopSpeech();session.completed=true;$("practiceSession").classList.add("hidden");$("practiceSetup").classList.add("hidden");$("practiceResult").classList.remove("hidden");const answered=session.answered,correct=session.correct,percentage=answered?Math.round(correct/answered*100):0;$("resultPercent").textContent=percentage+"%";$("resultDetails").textContent=`Правильно ${correct} из ${answered}`;const wrongContainer=$("wrongWords");if(!session.mistakes.length)wrongContainer.innerHTML='<div class="empty" style="padding:15px 0">🎉 Отлично! Ошибок нет.</div>';else wrongContainer.innerHTML=session.mistakes.filter((m,i,arr)=>arr.findIndex(x=>normalizeDutch(x.nl)===normalizeDutch(m.nl))===i).map(m=>`<div class="wrong-item"><div class="word-nl">${escapeHTML(m.nl)}</div><div class="word-ru">${escapeHTML(m.ru)}</div></div>`).join("");$("progressFill").style.width="100%";}
+$("retryButton").addEventListener("click",()=>{if(!session)return;const previous={pool:session.pool,count:session.count,mode:session.mode};sessionSentenceUsed=new Map();session={...previous,index:0,correct:0,answered:0,mistakes:[],completed:false};$("practiceResult").classList.add("hidden");$("practiceSession").classList.remove("hidden");$("sessionMode").textContent=MODE_NAMES[session.mode];nextQuestion();});
+$("backThemesButton").addEventListener("click",()=>{session=null;currentQuestion=null;$("practiceResult").classList.add("hidden");$("practiceSession").classList.add("hidden");$("practiceSetup").classList.remove("hidden");renderPracticeThemes();});
+renderPracticeThemes();renderWords();renderThemeSuggestions();
+if("speechSynthesis"in window)speechSynthesis.onvoiceschanged=()=>speechSynthesis.getVoices();
+document.addEventListener("visibilitychange",()=>{if(document.hidden)stopSpeech();});
+</script>
+</body>
+</html>
