@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Слова">
+<meta name="theme-color" content="#0d1422">
+<link rel="apple-touch-icon" href="apple-touch-icon.PNG">
+<link rel="icon" href="apple-touch-icon.PNG">
+<title>Тренажёр голландских слов</title>
+<style>
+:root {
+  color-scheme: dark;
+  --bg:#0d1422; --surface:#19263b; --surface2:#202f47; --surface3:#263852;
+  --border:#30435f; --text:#f3f6ff; --muted:#a9b6ca; --accent:#79a8ff;
+  --accent-text:#10213e; --success:#39c98a; --success-bg:#173c35;
+  --error:#ff727e; --error-bg:#482a37; --shadow:0 12px 35px rgba(0,0,0,.13);
+  --radius:25px;
+}
+[data-theme="light"] {
+  color-scheme:light; --bg:#f2f5fa; --surface:#fff; --surface2:#eaf0f9;
+  --surface3:#dce7f6; --border:#d2deef; --text:#17243a; --muted:#66758d;
+  --accent:#6698f5; --accent-text:#10213e; --success:#168c60;
+  --success-bg:#dcf5e9; --error:#d94759; --error-bg:#ffe7e9;
+  --shadow:0 8px 28px rgba(30,50,80,.07);
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html{min-height:100%;scroll-behavior:smooth}
+body{margin:0;min-height:100vh;min-height:100dvh;background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","Segoe UI",sans-serif;transition:background .2s,color .2s}
+button,input,textarea,select{font:inherit}
+button{cursor:pointer;-webkit-appearance:none}
+button:disabled{opacity:.45;cursor:not-allowed}
+.app{width:100%;max-width:760px;min-height:100vh;min-height:100dvh;margin:0 auto;padding:calc(20px + env(safe-area-inset-top)) 20px calc(115px + env(safe-area-inset-bottom))}
+.header{display:flex;justify-content:space-between;align-items:center;margin:12px 0 35px;gap:12px}
+.brand{min-width:0}.brand-title{font-size:27px;font-weight:850;letter-spacing:-.8px}
+.brand-subtitle{color:var(--muted);margin-top:7px;font-size:15px}
+.theme-toggle{flex-shrink:0;width:65px;height:65px;border-radius:23px;border:1px solid var(--border);background:var(--surface2);color:var(--text);font-size:28px}
+.page-heading{font-size:37px;font-weight:850;letter-spacing:-1.2px;margin:0 0 9px}
+.page-description{color:var(--muted);font-size:17px;line-height:1.5;margin:0 0 25px}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:22px;box-shadow:var(--shadow);margin-bottom:18px}
+.section-title{font-size:19px;font-weight:800;margin:0 0 15px}
+label{display:block;font-size:15px;font-weight:700;margin-bottom:9px}
+.field{width:100%;min-height:57px;border:1px solid var(--border);background:var(--surface2);border-radius:17px;color:var(--text);padding:14px 16px;outline:none;font-size:16px;transition:border-color .2s,background .2s}
+.field:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(121,168,255,.13)}
+textarea.field{resize:vertical;min-height:155px;line-height:1.55}
+.field::placeholder{color:var(--muted);opacity:.8}
+.form-group{margin-bottom:19px}
+.hint{color:var(--muted);font-size:13px;line-height:1.5;margin-top:8px}
+.btn{border:0;min-height:58px;border-radius:18px;padding:14px 20px;font-size:17px;font-weight:800;transition:transform .12s,filter .12s,background .15s}
+.btn:active{transform:scale(.98)}
+.btn-primary{width:100%;color:var(--accent-text);background:var(--accent)}
+.btn-secondary{width:100%;color:var(--text);background:var(--surface2);border:1px solid var(--border)}
+.btn-small{min-height:43px;padding:9px 14px;font-size:14px;border-radius:13px}
+.status{display:none;padding:14px 16px;border-radius:15px;margin:15px 0;font-size:14px;line-height:1.5;font-weight:650;white-space:pre-wrap}
+.status.show{display:block}.status.ok{color:var(--success);background:var(--success-bg)}
+.status.error{color:var(--error);background:var(--error-bg)}.status.info{color:var(--text);background:var(--surface2)}
+.divider{border:0;height:1px;background:var(--border);margin:23px 0}
+details{border:1px solid var(--border);border-radius:17px;padding:15px;background:var(--surface2)}
+summary{cursor:pointer;font-weight:750;font-size:15px}
+details .form-group:first-of-type{margin-top:18px}
+.api-note{color:var(--muted);font-size:13px;line-height:1.6;margin-top:9px}
+.word-count{font-size:14px;color:var(--muted);margin-bottom:15px}
+.word-group{margin-bottom:22px}.word-group-title{color:var(--accent);font-weight:800;font-size:16px;margin-bottom:10px}
+.word-line{padding:13px 3px;border-bottom:1px solid var(--border);font-size:16px;line-height:1.5;overflow-wrap:anywhere}
+.word-line:last-child{border-bottom:0}.word-nl{font-weight:750}.word-separator{color:var(--muted);margin:0 5px}
+.empty-state{text-align:center;padding:38px 15px;color:var(--muted);line-height:1.6}.empty-icon{font-size:42px;margin-bottom:13px}
+.custom-select{position:relative}
+.select-trigger{width:100%;min-height:57px;padding:14px 16px;border:1px solid var(--border);border-radius:16px;background:var(--surface2);color:var(--text);display:flex;align-items:center;justify-content:space-between;text-align:left;font-size:16px;font-weight:650}
+.select-options{display:none;position:absolute;z-index:20;top:calc(100% + 7px);left:0;right:0;max-height:300px;overflow-y:auto;background:var(--surface);border:1px solid var(--border);border-radius:17px;padding:9px;box-shadow:var(--shadow)}
+.select-options.open{display:block}
+.select-option{display:flex;align-items:center;gap:12px;padding:13px 11px;border-radius:11px;font-size:15px;font-weight:600}
+.select-option:active{background:var(--surface2)}.select-option input{width:20px;height:20px;accent-color:var(--accent);flex-shrink:0}
+.select-done{margin:7px 0 0;width:100%;min-height:45px;border:0;border-radius:12px;background:var(--accent);color:var(--accent-text);font-weight:800}
+.segmented{display:grid;grid-template-columns:repeat(2,1fr);gap:9px}
+.segment{min-height:53px;border:1px solid var(--border);background:var(--surface2);color:var(--muted);border-radius:15px;font-size:15px;font-weight:750}
+.segment.active{color:var(--accent);background:var(--surface3);border-color:var(--accent)}
+.number-options{display:grid;grid-template-columns:repeat(4,1fr);gap:9px}
+.number-option{min-height:52px;border:1px solid var(--border);background:var(--surface2);color:var(--muted);border-radius:14px;font-weight:800;font-size:17px}
+.number-option.active{background:var(--surface3);border-color:var(--accent);color:var(--accent)}
+.bottom-nav{position:fixed;z-index:50;left:0;right:0;bottom:0;display:grid;grid-template-columns:repeat(3,1fr);max-width:760px;margin:0 auto;padding:10px 12px calc(10px + env(safe-area-inset-bottom));background:var(--bg);border-top:1px solid var(--border)}
+.nav-item{border:0;background:transparent;color:var(--muted);min-height:68px;border-radius:21px;display:flex;flex-direction:column;justify-content:center;align-items:center;gap:4px;font-size:14px;font-weight:750}
+.nav-icon{font-size:23px;line-height:1.3}.nav-item.active{background:var(--surface2);color:var(--accent)}
+.hidden{display:none!important}
+.practice-card{padding:21px}.practice-meta{display:flex;justify-content:space-between;color:var(--muted);font-size:14px;font-weight:750;gap:10px}
+.progress-track{height:9px;background:var(--surface2);border-radius:20px;overflow:hidden;margin:15px 0 23px}
+.progress-fill{height:100%;width:0;background:var(--accent);border-radius:inherit;transition:width .25s}
+.lesson-exit{width:100%;border:1px solid var(--border);border-radius:14px;background:var(--surface2);color:var(--text);min-height:45px;font-weight:750;margin-bottom:19px}
+.question-type{display:inline-block;color:var(--accent);background:var(--surface2);padding:7px 12px;border-radius:10px;font-size:12px;font-weight:800;margin-bottom:19px}
+.question-title{font-size:clamp(27px,6vw,40px);font-weight:850;line-height:1.22;letter-spacing:-.8px;text-align:center;margin:25px 0;overflow-wrap:anywhere}
+.question-subtitle{text-align:center;color:var(--muted);font-size:15px;line-height:1.55;margin:0 0 20px}
+.question-area{min-height:130px}.answer-input{min-height:67px;text-align:center;font-size:21px;margin-bottom:13px}
+.shake{animation:shake .25s linear}@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-6px)}50%{transform:translateX(6px)}75%{transform:translateX(-4px)}}
+.input-wrong{border-color:var(--error)!important;background:var(--error-bg)!important}
+.input-right{border-color:var(--success)!important;background:var(--success-bg)!important}
+.choice-list{display:flex;flex-direction:column;gap:10px}
+.choice{width:100%;min-height:61px;padding:13px 16px;text-align:left;border-radius:16px;border:1px solid var(--border);background:var(--surface2);color:var(--text);font-size:17px;font-weight:700;overflow-wrap:anywhere}
+.choice:active:not(:disabled){border-color:var(--accent)}
+.choice.wrong{background:var(--error-bg);border-color:var(--error);color:var(--error)}
+.choice.correct{background:var(--success-bg);border-color:var(--success);color:var(--success)}
+.attempt-info{text-align:center;color:var(--error);font-weight:750;font-size:14px;margin:12px 0;min-height:19px}
+.feedback{display:none;text-align:center;border-radius:14px;padding:13px;margin:12px 0;line-height:1.5;font-size:15px;font-weight:750}
+.feedback.show{display:block}.feedback.good{color:var(--success);background:var(--success-bg)}.feedback.bad{color:var(--error);background:var(--error-bg)}
+.question-action{margin-top:15px}.sound-button{width:100%;min-height:65px;border-radius:16px;border:1px solid var(--border);background:var(--surface2);color:var(--text);font-size:18px;font-weight:800;margin-bottom:12px}
+.cubes-area{min-height:72px;border:1px dashed var(--border);border-radius:16px;padding:12px;display:flex;flex-wrap:wrap;align-content:flex-start;align-items:center;gap:8px;margin-bottom:14px}
+.cubes-area.wrong{border-color:var(--error);background:var(--error-bg);animation:shake .25s}
+.cubes-area.correct{border-color:var(--success);background:var(--success-bg)}
+.cube{border:1px solid var(--border);background:var(--surface2);color:var(--text);border-radius:11px;padding:10px 12px;font-size:15px;font-weight:700;min-height:42px}
+.cube.selected{background:var(--surface3);border-color:var(--accent)}.cube:disabled{opacity:.28}
+.cube-bank{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;padding:9px 0}
+.cube-hint{color:var(--muted);text-align:center;font-size:13px;margin:9px 0 16px}
+.sentence-display{font-size:clamp(22px,5.5vw,31px);line-height:1.5;font-weight:800;text-align:center;margin:20px 0;overflow-wrap:anywhere}
+.result-score{font-size:70px;text-align:center;font-weight:900;color:var(--accent);letter-spacing:-3px;margin:15px 0 5px}
+.result-caption{text-align:center;font-size:18px;font-weight:750;margin-bottom:24px}
+.result-item{padding:13px;border-radius:13px;background:var(--error-bg);margin-bottom:9px;font-size:14px;line-height:1.5}
+.result-item strong{display:block;color:var(--error);font-size:16px;margin-bottom:4px}
+.result-success{padding:20px;background:var(--success-bg);color:var(--success);text-align:center;border-radius:15px;font-weight:750;line-height:1.6}
+.modal-overlay{position:fixed;inset:0;z-index:100;background:rgba(0,0,0,.62);display:none;align-items:center;justify-content:center;padding:22px}
+.modal-overlay.show{display:flex}.modal{width:100%;max-width:420px;padding:24px;background:var(--surface);border:1px solid var(--border);border-radius:24px;box-shadow:var(--shadow)}
+.modal h2{margin:0 0 10px;font-size:23px}.modal p{color:var(--muted);line-height:1.5;font-size:14px;margin-bottom:20px}
+.modal .btn{margin-top:10px}.loading-spinner{display:inline-block;width:17px;height:17px;border:2px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin .7s linear infinite;vertical-align:middle;margin-right:7px}
+@keyframes spin{to{transform:rotate(360deg)}}
+@media(min-width:600px){.app{padding-left:30px;padding-right:30px}.segmented{grid-template-columns:repeat(4,1fr)}}
+@media(max-width:370px){.brand-title{font-size:23px}.page-heading{font-size:32px}.card{padding:17px}}
+</style>
+</head>
+<body>
+<div class="app">
+<header class="header">
+  <div class="brand"><div class="brand-title">🇳🇱 Тренажёр слов</div><div class="brand-subtitle">Учите голландский в своём темпе</div></div>
+  <button class="theme-toggle" id="themeToggle" aria-label="Сменить тему">☀️</button>
+</header>
+
+<section id="practicePage">
+  <div id="practiceMenu">
+    <h1 class="page-heading">Практика</h1><p class="page-description">Выберите темы и режим тренировки.</p>
+    <div class="card">
+      <div class="form-group"><label>Темы для изучения</label>
+        <div class="custom-select" id="topicSelector">
+          <button class="select-trigger" id="topicTrigger"><span id="topicTriggerText">Все темы</span><span>⌄</span></button>
+          <div class="select-options" id="topicOptions">
+            <label class="select-option"><input type="checkbox" id="allTopicsCheck" checked><span>Все темы</span></label>
+            <div id="topicCheckboxes"></div><button class="select-done" id="topicDone">Готово</button>
+          </div>
+        </div><div class="hint">Можно выбрать несколько тем одновременно.</div>
+      </div>
+      <div class="form-group"><label>Количество вопросов</label>
+        <div class="number-options" id="numberOptions">
+          <button class="number-option" data-count="5">5</button><button class="number-option active" data-count="10">10</button>
+          <button class="number-option" data-count="15">15</button><button class="number-option" data-count="20">20</button>
+        </div>
+      </div>
+      <div class="form-group"><label>Режим тренировки</label>
+        <div class="segmented" id="modeOptions">
+          <button class="segment active" data-mode="words">Слова</button><button class="segment" data-mode="write">Написать</button>
+          <button class="segment" data-mode="sentences">Предложения</button><button class="segment" data-mode="mix">Микс</button>
+        </div>
+      </div>
+      <div id="practiceStatus" class="status"></div><button class="btn btn-primary" id="startLesson">Начать тренировку →</button>
+    </div>
+  </div>
+  <div id="lessonScreen" class="hidden">
+    <button class="lesson-exit" id="exitLesson">✕ Выйти</button>
+    <div class="card practice-card">
+      <div class="practice-meta"><span id="questionCounter">Вопрос 1 из 10</span><span id="correctCounter">0 верно</span></div>
+      <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
+      <div id="questionContent"></div><div id="attemptInfo" class="attempt-info"></div>
+      <div id="feedback" class="feedback"></div><div id="questionAction" class="question-action"></div>
+    </div>
+  </div>
+  <div id="resultScreen" class="hidden"><div class="card">
+    <h1 class="page-heading" style="text-align:center">Результат</h1><div class="result-score" id="resultPercent">0%</div>
+    <div class="result-caption" id="resultCaption">Правильно 0 из 10</div><div id="resultMistakes"></div><hr class="divider">
+    <button class="btn btn-primary" id="retryLesson">↻ Пройти ещё раз</button>
+    <button class="btn btn-secondary" id="backToMenu" style="margin-top:11px">В меню</button>
+  </div></div>
+</section>
+
+<section id="wordsPage" class="hidden">
+  <h1 class="page-heading">Мои слова</h1><p class="page-description">Весь ваш словарный запас в одном месте.</p>
+  <div class="card"><div class="form-group"><label>Показать тему</label><select class="field" id="wordsThemeSelect"><option value="all">Все темы</option></select></div>
+    <div class="word-count" id="wordCount">Всего слов: 0</div><div id="wordsList"></div>
+  </div>
+</section>
+
+<section id="addPage" class="hidden">
+  <h1 class="page-heading">Добавить слова</h1><p class="page-description">Пополняйте словарь новыми словами и выражениями.</p>
+  <div class="card">
+    <div class="form-group"><label for="newTheme">Тема</label><input class="field" id="newTheme" list="existingThemes" placeholder="Например, Урок 1" autocomplete="off">
+      <datalist id="existingThemes"></datalist><div class="hint">Введите новую тему или выберите существующую.</div>
+    </div>
+    <div class="form-group"><label for="newWords">Голландские слова</label><textarea class="field" id="newWords" placeholder="de aansluiting&#10;behangen&#10;de binnenkant&#10;de eigenaar"></textarea><div class="hint">Каждое слово с новой строки. Перевод добавится автоматически.</div></div>
+    <button class="btn btn-secondary" id="copyPrompt">📋 Скопировать запрос для ChatGPT</button><hr class="divider">
+    <div class="form-group"><label for="chatResponse">Вставьте ответ ChatGPT</label><textarea class="field" id="chatResponse" placeholder="Вставьте сюда JSON-массив из ответа ChatGPT..."></textarea></div>
+    <button class="btn btn-primary" id="importWords">ОК — Добавить слова</button><div id="addStatus" class="status"></div><hr class="divider">
+    <details><summary>⚙️ Автоматический режим (OpenAI API)</summary>
+      <div class="form-group"><label for="apiKey">OpenAI API Key</label><input class="field" type="password" id="apiKey" placeholder="sk-..." autocomplete="off">
+        <div class="api-note">Ключ хранится только в localStorage этого устройства. При использовании автоматического режима запросы отправляются напрямую в OpenAI API. Не используйте ключ на общедоступных устройствах. API оплачивается отдельно согласно тарифам OpenAI.</div>
+      </div>
+      <button class="btn btn-secondary" id="saveApiKey">Сохранить ключ</button><div class="hint" id="apiStatus"></div>
+      <div class="hint">При нажатии ОК слова будут обрабатываться автоматически пачками по 10.</div>
+    </details>
+  </div>
+</section>
+</div>
+
+<nav class="bottom-nav" id="bottomNav">
+  <button class="nav-item active" data-page="practice"><span class="nav-icon">✦</span><span>Практика</span></button>
+  <button class="nav-item" data-page="words"><span class="nav-icon">▤</span><span>Слова</span></button>
+  <button class="nav-item" data-page="add"><span class="nav-icon">＋</span><span>Добавить</span></button>
+</nav>
+
+<div class="modal-overlay" id="exitModal"><div class="modal">
+  <h2>Завершить тренировку?</h2><p>Вы можете продолжить, посмотреть результат по отвеченным вопросам или выйти без сохранения результата.</p>
+  <button class="btn btn-secondary" id="continueLesson">Продолжить</button>
+  <button class="btn btn-primary" id="finishLesson">Завершить и показать результат</button>
+  <button class="btn btn-secondary" id="quitLesson" style="margin-top:10px">Выйти без результата</button>
+</div></div>
+
+<script>
+"use strict";
+(() => {
+const STORAGE_KEY="dutch_trainer_v3",THEME_KEY="dutch_trainer_theme",API_KEY_STORAGE="dutch_trainer_api_key";
+let words=[],selectedTopics=[],questionCount=10,selectedMode="words",currentPage="practice",lesson=null,busy=false;
+const $=id=>document.getElementById(id);
+function safeGet(key,fallback=null){try{const v=localStorage.getItem(key);return v===null?fallback:v}catch(e){console.warn(e);return fallback}}
+function safeSet(key,value){try{localStorage.setItem(key,value);return true}catch(e){console.warn(e);return false}}
+function validStoredWord(w){return w&&typeof w.nl==="string"&&typeof w.ru==="string"&&Array.isArray(w.sentences)}
+function loadWords(){try{const p=JSON.parse(safeGet(STORAGE_KEY,"[]"));words=Array.isArray(p)?p.filter(validStoredWord):[]}catch(e){words=[]}}
+function saveWords(){if(!safeSet(STORAGE_KEY,JSON.stringify(words)))showStatus("addStatus","Не удалось сохранить данные. Возможно, память устройства заполнена.","error")}
+loadWords();
+function showStatus(id,message,type="info"){const el=$(id);if(el){el.textContent=message;el.className="status show "+type}}
+function hideStatus(id){if($(id))$(id).className="status"}
+function escapeHTML(v){return String(v??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[c]))}
+function randomItem(a){return a[Math.floor(Math.random()*a.length)]}
+function shuffle(a){const r=[...a];for(let i=r.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[r[i],r[j]]=[r[j],r[i]]}return r}
+function unique(a){return [...new Set(a)]}
+function setTheme(t){document.documentElement.dataset.theme=t;safeSet(THEME_KEY,t);$("themeToggle").textContent=t==="dark"?"☀️":"🌙";document.querySelector('meta[name="theme-color"]').content=t==="dark"?"#0d1422":"#f2f5fa"}
+setTheme(safeGet(THEME_KEY,"dark")==="light"?"light":"dark");
+$("themeToggle").addEventListener("click",()=>setTheme(document.documentElement.dataset.theme==="dark"?"light":"dark"));
+
+function switchPage(page){if(lesson&&page!=="practice"){showExitModal();return}currentPage=page;$("practicePage").classList.toggle("hidden",page!=="practice");$("wordsPage").classList.toggle("hidden",page!=="words");$("addPage").classList.toggle("hidden",page!=="add");document.querySelectorAll(".nav-item").forEach(b=>b.classList.toggle("active",b.dataset.page===page));if(page==="words")renderWords();if(page==="add")renderThemeHints();window.scrollTo({top:0,behavior:"smooth"})}
+document.querySelectorAll(".nav-item").forEach(b=>b.addEventListener("click",()=>switchPage(b.dataset.page)));
+
+function getThemes(){return unique(words.map(w=>w.theme).filter(Boolean)).sort((a,b)=>a.localeCompare(b,"ru"))}
+function renderThemeHints(){const themes=getThemes();$("existingThemes").innerHTML=themes.map(t=>`<option value="${escapeHTML(t)}"></option>`).join("");const current=$("wordsThemeSelect").value;$("wordsThemeSelect").innerHTML='<option value="all">Все темы</option>'+themes.map(t=>`<option value="${escapeHTML(t)}">${escapeHTML(t)}</option>`).join("");if(themes.includes(current))$("wordsThemeSelect").value=current}
+function renderTopicCheckboxes(){const themes=getThemes();$("topicCheckboxes").innerHTML=themes.map(t=>`<label class="select-option"><input type="checkbox" class="topic-check" value="${escapeHTML(t)}" ${selectedTopics.includes(t)?"checked":""}><span>${escapeHTML(t)}</span></label>`).join("");document.querySelectorAll(".topic-check").forEach(cb=>cb.addEventListener("change",()=>{selectedTopics=[...document.querySelectorAll(".topic-check:checked")].map(x=>x.value);updateTopicLabel()}));$("allTopicsCheck").checked=selectedTopics.length===0;updateTopicLabel()}
+function updateTopicLabel(){const all=getThemes(),selected=selectedTopics.filter(t=>all.includes(t));$("topicTriggerText").textContent=selected.length===0||selected.length===all.length?"Все темы":selected.length===1?selected[0]:"Выбрано: "+selected.length}
+$("topicTrigger").addEventListener("click",e=>{e.stopPropagation();$("topicOptions").classList.toggle("open");renderTopicCheckboxes()});
+$("topicDone").addEventListener("click",()=>$("topicOptions").classList.remove("open"));
+$("allTopicsCheck").addEventListener("change",e=>{if(e.target.checked){selectedTopics=[];renderTopicCheckboxes()}});
+document.addEventListener("click",e=>{if(!$("topicSelector").contains(e.target))$("topicOptions").classList.remove("open")});
+
+function renderWords(){renderThemeHints();const theme=$("wordsThemeSelect").value,filtered=theme==="all"?words:words.filter(w=>w.theme===theme);$("wordCount").textContent="Всего слов: "+filtered.length;if(!filtered.length){$("wordsList").innerHTML='<div class="empty-state"><div class="empty-icon">📚</div>Пока здесь нет слов.<br>Добавьте слова во вкладке «Добавить».</div>';return}const groups={};filtered.forEach(w=>{const t=w.theme||"Без темы";(groups[t]??=[]).push(w)});$("wordsList").innerHTML=Object.entries(groups).map(([t,items])=>`<div class="word-group">${theme==="all"?`<div class="word-group-title">${escapeHTML(t)}</div>`:""}${items.map(w=>`<div class="word-line"><span class="word-nl">${escapeHTML(w.nl)}</span><span class="word-separator">—</span><span>${escapeHTML(w.ru)}</span></div>`).join("")}</div>`).join("")}
+$("wordsThemeSelect").addEventListener("change",renderWords);
+
+function getInputWords(){return $("newWords").value.split(/\r?\n/).map(s=>s.trim()).filter(Boolean)}
+const BASE_PROMPT='Ты помощник для изучающего голландский язык (уровень A2-B1), родной язык русский. Для каждого слова из списка верни ТОЛЬКО JSON-массив в одном блоке кода. Без пояснений, без заголовков, не пиши программ, не создавай файлов и canvas, просто текст ответа. Формат элемента: {"nl": "слово как дано", "ru": "краткий перевод, 1-3 слова", "sentences": [ровно 5 РАЗНЫХ голландских предложений уровня A2-B1 по 6-12 слов (бытовые и рабочие ситуации, допускаются придаточные предложения, разные времена и конструкции), каждое содержит это слово в исходной форме; каждое в виде {"s": "голландское предложение", "sr": "точный естественный перевод на русский"}]}. Порядок как в списке. Слова: ';
+function makePrompt(list){return BASE_PROMPT+list.join("\n")}
+async function copyText(text){try{if(navigator.clipboard&&window.isSecureContext)await navigator.clipboard.writeText(text);else{const ta=document.createElement("textarea");ta.value=text;ta.style.position="fixed";ta.style.opacity="0";document.body.appendChild(ta);ta.select();const ok=document.execCommand("copy");ta.remove();if(!ok)throw Error("copy failed")}return true}catch(e){return false}}
+$("copyPrompt").addEventListener("click",async()=>{const list=getInputWords();if(!list.length){showStatus("addStatus","Сначала введите голландские слова.","error");return}const ok=await copyText(makePrompt(list));showStatus("addStatus",ok?"Запрос скопирован. Отправьте его в ChatGPT и вставьте ответ ниже.":"Не удалось скопировать автоматически. Попробуйте ещё раз.",ok?"ok":"error")});
+function normalizeWord(s){return String(s||"").toLocaleLowerCase("nl-NL").normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/^[\s.,!?;:()[\]{}"'«»]+|[\s.,!?;:()[\]{}"'«»]+$/g,"").replace(/^(de|het|een)\s+/i,"").replace(/\s+/g," ").trim()}
+function validateImportedWords(data){if(!Array.isArray(data))throw Error("Ожидается JSON-массив.");if(!data.length)throw Error("Массив не содержит слов.");return data.map((item,i)=>{if(!item||typeof item!=="object")throw Error(`Элемент ${i+1}: неверный формат.`);const nl=String(item.nl||"").trim(),ru=String(item.ru||"").trim(),s=item.sentences;if(!nl||!ru)throw Error(`Элемент ${i+1}: отсутствует слово или перевод.`);if(!Array.isArray(s)||s.length!==5)throw Error(`Слово «${nl}»: необходимо ровно 5 предложений.`);return{nl,ru,sentences:s.map((x,j)=>{if(!x||typeof x.s!=="string"||typeof x.sr!=="string"||!x.s.trim()||!x.sr.trim())throw Error(`Слово «${nl}»: ошибка в предложении ${j+1}.`);return{s:x.s.trim(),sr:x.sr.trim()}}),used:[]}})}
+function extractJSON(text){const first=text.indexOf("["),last=text.lastIndexOf("]");if(first<0||last<first)throw Error("JSON-массив не найден. Проверьте ответ ChatGPT.");return JSON.parse(text.slice(first,last+1))}
+function addImported(data,theme){let added=0,replaced=0;data.forEach(item=>{const key=normalizeWord(item.nl),index=words.findIndex(w=>normalizeWord(w.nl)===key),nw={id:"w_"+Date.now()+"_"+Math.random().toString(36).slice(2,9),theme,nl:item.nl,ru:item.ru,sentences:item.sentences,used:[]};if(index>=0){words[index]=nw;replaced++}else{words.push(nw);added++}});saveWords();renderThemeHints();renderTopicCheckboxes();renderWords();return{added,replaced}}
+function clearAddFields(){$("newTheme").value="";$("newWords").value="";$("chatResponse").value=""}
+$("importWords").addEventListener("click",async()=>{if(busy)return;const theme=$("newTheme").value.trim(),input=getInputWords();if(!theme){showStatus("addStatus","Введите название темы.","error");return}if(!input.length){showStatus("addStatus","Введите хотя бы одно слово.","error");return}if($("apiKey").value.trim()){await automaticImport(theme,input);return}try{const data=validateImportedWords(extractJSON($("chatResponse").value)),inputSet=new Set(input.map(normalizeWord)),resultSet=new Set(data.map(w=>normalizeWord(w.nl))),missing=input.filter(w=>!resultSet.has(normalizeWord(w)));if(missing.length)throw Error("В ответе отсутствуют слова: "+missing.join(", "));if(data.some(w=>!inputSet.has(normalizeWord(w.nl))))throw Error("В ответе есть слова, которых нет в исходном списке.");const result=addImported(data,theme);clearAddFields();showStatus("addStatus",`Добавлено: ${result.added}, заменено: ${result.replaced}.`,"ok")}catch(e){showStatus("addStatus","Ошибка: "+e.message,"error")}});
+
+$("apiKey").value=safeGet(API_KEY_STORAGE,"");
+$("saveApiKey").addEventListener("click",()=>{const key=$("apiKey").value.trim();if(!key){safeSet(API_KEY_STORAGE,"");$("apiStatus").textContent="Ключ удалён.";return}safeSet(API_KEY_STORAGE,key);$("apiStatus").textContent="Ключ сохранён на этом устройстве."});
+async function automaticImport(theme,inputWords){const key=$("apiKey").value.trim();if(!key){showStatus("addStatus","Введите API-ключ.","error");return}busy=true;$("importWords").disabled=true;$("importWords").innerHTML='<span class="loading-spinner"></span>Обработка...';let allData=[];try{const batches=[];for(let i=0;i<inputWords.length;i+=10)batches.push(inputWords.slice(i,i+10));for(let i=0;i<batches.length;i++){showStatus("addStatus",`Обработка пачки ${i+1} из ${batches.length}...`,"info");const systemPrompt='Ты помощник для изучающего голландский язык, уровень A2-B1, родной язык русский. Верни только JSON-объект {"words":[{"nl":"слово как дано","ru":"краткий перевод, 1-3 слова","sentences":[{"s":"голландское предложение","sr":"точный естественный русский перевод"}]}]}. Для каждого слова необходимо ровно 5 РАЗНЫХ голландских предложений уровня A2-B1 по 6-12 слов. Бытовые и рабочие ситуации, разные времена и конструкции. Каждое предложение должно содержать исходное слово в исходной форме. Не добавляй лишних полей. Порядок слов сохраняй.';const response=await fetch("https://api.openai.com/v1/chat/completions",{method:"POST",headers:{"Content-Type":"application/json","Authorization":"Bearer "+key},body:JSON.stringify({model:"gpt-4o-mini",temperature:.7,response_format:{type:"json_object"},messages:[{role:"system",content:systemPrompt},{role:"user",content:"Создай словарные карточки для слов:\n"+batches[i].join("\n")}]})});const json=await response.json();if(!response.ok)throw Error(json.error?.message||`Ошибка API: ${response.status}`);const content=json.choices?.[0]?.message?.content;if(!content)throw Error("API вернул пустой ответ.");const validated=validateImportedWords(JSON.parse(content).words),expected=new Set(batches[i].map(normalizeWord)),received=new Set(validated.map(w=>normalizeWord(w.nl))),missing=batches[i].filter(w=>!received.has(normalizeWord(w)));if(missing.length)throw Error("API не вернул слова: "+missing.join(", "));if(validated.some(w=>!expected.has(normalizeWord(w.nl))))throw Error("API вернул лишние слова.");allData=allData.concat(validated)}const result=addImported(allData,theme);clearAddFields();showStatus("addStatus",`Готово! Добавлено: ${result.added}, заменено: ${result.replaced}.`,"ok")}catch(e){showStatus("addStatus","Ошибка автоматического режима: "+e.message+"\n\nПопробуйте ручной способ: скопируйте запрос для ChatGPT и вставьте полученный JSON в поле ниже.","error")}finally{busy=false;$("importWords").disabled=false;$("importWords").textContent="ОК — Добавить слова"}}
+
+function speak(text){if(!("speechSynthesis"in window))return;window.speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(text);u.lang="nl-NL";u.rate=.9;const voices=window.speechSynthesis.getVoices(),v=voices.find(x=>x.lang.toLowerCase()==="nl-nl")||voices.find(x=>x.lang.toLowerCase().startsWith("nl"));if(v)u.voice=v;window.speechSynthesis.speak(u)}
+const WORD_TYPES=["a","b"],WRITE_TYPES=["c","d"],SENTENCE_TYPES=["e","f","g"],ALL_TYPES=["a","b","c","d","e","f","g"];
+function getAvailableWords(){return selectedTopics.length?words.filter(w=>selectedTopics.includes(w.theme)):[...words]}
+function getSentenceForWord(w){if(!w.sentences?.length)throw Error("У слова «"+w.nl+"» нет предложений.");if(!Array.isArray(w.used))w.used=[];const local=lesson.sentenceUsed[w.id]||[];let candidates=w.sentences.map((s,i)=>i).filter(i=>!local.includes(i));if(!candidates.length){w.used=[];candidates=w.sentences.map((s,i)=>i)}const notUsed=candidates.filter(i=>!w.used.includes(i));const index=randomItem(notUsed.length?notUsed:candidates);w.used.push(index);local.push(index);lesson.sentenceUsed[w.id]=local;saveWords();return{sentence:w.sentences[index],index}}
+function chooseWord(pool){let candidates=pool.filter(w=>!lesson.lastWords.slice(-2).includes(w.id));if(!candidates.length)candidates=pool;const w=randomItem(candidates);lesson.lastWords.push(w.id);return w}
+function similarityScore(a,b){a=normalizeWord(a);b=normalizeWord(b);if(!a||!b)return 0;let s=0;if(a[0]===b[0])s+=5;if(Math.abs(a.length-b.length)<=2)s+=4;if(a.slice(0,2)===b.slice(0,2))s+=4;const short=a.length<b.length?a:b,long=a.length<b.length?b:a;if(long.includes(short))s+=2;return s}
+function makeOptions(w,pool,field){const correct=w[field],norm=normalizeWord(correct);let candidates=pool.filter(x=>x.id!==w.id&&normalizeWord(x[field])!==norm);candidates.sort((a,b)=>similarityScore(correct,b[field])-similarityScore(correct,a[field]));let selected=candidates.slice(0,3).map(x=>x[field]);if(selected.length<3){const extra=words.filter(x=>normalizeWord(x[field])!==norm&&!selected.some(s=>normalizeWord(s)===normalizeWord(x[field])));selected=selected.concat(extra.slice(0,3-selected.length).map(x=>x[field]))}const fillers=field==="nl"?["de woning","het gebouw","de kamer"]:["дом","комната","работа"];while(selected.length<3)selected.push(fillers[selected.length]);return shuffle(unique([correct,...selected]).slice(0,4))}
+function makeGapSentence(w,s){for(const token of w.nl.trim().split(/\s+/).filter(Boolean)){const re=new RegExp(token.replace(/[.*+?^${}()|[\]\\]/g,"\\$&"),"i");if(re.test(s))return s.replace(re,"_____")}const p=s.replace(/[.,!?;:]/g,"").split(/\s+/);p[Math.max(0,Math.floor(p.length/2))]="_____";return p.join(" ")+(/[.!?]$/.test(s)?s.slice(-1):"")}
+function makeGapOptions(w,pool){let c=pool.filter(x=>x.id!==w.id&&normalizeWord(x.nl)!==normalizeWord(w.nl));c.sort((a,b)=>similarityScore(w.nl,b.nl)-similarityScore(w.nl,a.nl));let o=c.slice(0,3).map(x=>x.nl);if(o.length<3)o=o.concat(words.filter(x=>normalizeWord(x.nl)!==normalizeWord(w.nl)).slice(0,3-o.length).map(x=>x.nl));while(o.length<3)o.push(["het huis","de kamer","de deur"][o.length]);return shuffle(unique([w.nl,...o]).slice(0,4))}
+function makeCubes(s){const tokens=s.match(/[\p{L}\p{M}\p{N}]+(?:['’][\p{L}\p{M}]+)?|[.,!?;:]/gu)||[];return shuffle(tokens.map((v,i)=>({id:i+"_"+Math.random().toString(36).slice(2,7),value:v})))}
+function createLessonQuestion(pool,type){const w=chooseWord(pool),q={type,word:w,attempts:0,completed:false,correct:false,disabledChoices:[],answer:null,selectedCubes:[],cubeBank:[],sentence:null,sentenceIndex:null};if(["e","f","g"].includes(type)){const r=getSentenceForWord(w);q.sentence=r.sentence;q.sentenceIndex=r.index}if(type==="a")q.options=makeOptions(w,pool,"ru");if(type==="b")q.options=makeOptions(w,pool,"nl");if(type==="e"){q.cubeLanguage="ru";q.cubeBank=makeCubes(q.sentence.sr)}if(type==="f"){q.cubeLanguage="nl";q.cubeBank=makeCubes(q.sentence.s)}if(type==="g"){q.options=makeGapOptions(w,pool);q.gapSentence=makeGapSentence(w,q.sentence.s)}return q}
+function startNewLesson(){const pool=getAvailableWords();if(!pool.length){showStatus("practiceStatus","В выбранных темах пока нет слов. Добавьте слова или выберите другие темы.","error");return}if(pool.some(w=>!Array.isArray(w.sentences)||w.sentences.length!==5)){showStatus("practiceStatus","Некоторые слова не содержат пяти предложений. Проверьте данные словаря.","error");return}const types=selectedMode==="words"?WORD_TYPES:selectedMode==="write"?WRITE_TYPES:selectedMode==="sentences"?SENTENCE_TYPES:ALL_TYPES;lesson={settings:{count:questionCount,mode:selectedMode,topics:[...selectedTopics]},questions:[],index:0,correct:0,mistakes:[],lastWords:[],sentenceUsed:{},answered:0};for(let i=0;i<questionCount;i++)lesson.questions.push(createLessonQuestion(pool,randomItem(types)));$("practiceMenu").classList.add("hidden");$("lessonScreen").classList.remove("hidden");$("resultScreen").classList.add("hidden");renderQuestion();window.scrollTo({top:0,behavior:"smooth"})}
+
+const TYPE_NAMES={a:"Выберите перевод",b:"Выберите голландское слово",c:"Напишите слово",d:"Аудирование",e:"Соберите перевод",f:"Соберите предложение",g:"Вставьте пропущенное слово"};
+function renderChoices(q){return'<div class="choice-list">'+q.options.map((o,i)=>{const disabled=q.disabledChoices.includes(i)||q.completed;return`<button class="choice ${q.completed&&normalizeWord(o)===normalizeWord(q.word.nl)?"correct":""}" data-choice="${i}" ${disabled?"disabled":""}>${escapeHTML(o)}</button>`}).join("")+"</div>"}
+function renderInput(q){return`<input class="field answer-input" id="answerInput" type="text" placeholder="Введите ответ..." autocomplete="off" autocapitalize="none" spellcheck="false" ${q.completed?"disabled":""}><button class="btn btn-primary" id="checkTyped" ${q.completed?"disabled":""}>Проверить</button>`}
+function renderCubeQuestion(q){return`<div class="cubes-area" id="selectedCubes">${q.selectedCubes.map((c,i)=>`<button class="cube selected" data-selected="${i}" ${q.completed?"disabled":""}>${escapeHTML(c.value)}</button>`).join("")}</div><div class="cube-hint">Нажмите на кубик, чтобы добавить его. Нажмите на выбранный кубик, чтобы убрать его.</div><div class="cube-bank">${q.cubeBank.map((c,i)=>{const selected=q.selectedCubes.some(x=>x.id===c.id);return`<button class="cube" data-bank="${i}" ${selected||q.completed?"disabled":""}>${escapeHTML(c.value)}</button>`}).join("")}</div><button class="btn btn-secondary" id="clearCubes" ${q.completed||!q.selectedCubes.length?"disabled":""}>Очистить ответ</button><button class="btn btn-primary" id="checkCubes" style="margin-top:10px" ${q.completed?"disabled":""}>Проверить</button>`}
+function renderCubeEvents(q){$("questionContent").querySelectorAll("[data-bank]").forEach(b=>b.addEventListener("click",()=>{if(q.completed)return;const c=q.cubeBank[Number(b.dataset.bank)];if(!q.selectedCubes.some(x=>x.id===c.id)){q.selectedCubes.push(c);renderQuestion()}}));$("questionContent").querySelectorAll("[data-selected]").forEach(b=>b.addEventListener("click",()=>{if(q.completed)return;q.selectedCubes.splice(Number(b.dataset.selected),1);renderQuestion()}));$("clearCubes")?.addEventListener("click",()=>{q.selectedCubes=[];renderQuestion()});$("checkCubes")?.addEventListener("click",checkCubeAnswer)}
+function renderQuestion(){if(!lesson)return;const q=lesson.questions[lesson.index];if(!q){showResults();return}$("questionCounter").textContent=`Вопрос ${lesson.index+1} из ${lesson.settings.count}`;$("correctCounter").textContent=lesson.correct+" верно";$("progressFill").style.width=(lesson.index/lesson.settings.count*100)+"%";$("attemptInfo").textContent="";$("feedback").className="feedback";$("feedback").textContent="";$("questionAction").innerHTML="";let h=`<div class="question-type">${escapeHTML(TYPE_NAMES[q.type])}</div>`;switch(q.type){case"a":h+=`<div class="question-title">${escapeHTML(q.word.nl)}</div><p class="question-subtitle">Выберите правильный перевод на русский язык.</p>${renderChoices(q)}`;break;case"b":h+=`<div class="question-title">${escapeHTML(q.word.ru)}</div><p class="question-subtitle">Выберите соответствующее голландское слово.</p>${renderChoices(q)}`;break;case"c":h+=`<div class="question-title">${escapeHTML(q.word.ru)}</div><p class="question-subtitle">Напишите это слово по-голландски.</p>${renderInput(q)}`;break;case"d":h+='<div class="question-title">🎧 Слушайте и напишите</div><p class="question-subtitle">Нажмите «Повторить звук», чтобы услышать слово.</p><button class="sound-button" id="repeatSound">🔊 Повторить звук</button>'+renderInput(q);break;case"e":h+=`<div class="question-title">Переведите на русский</div><div class="sentence-display">${escapeHTML(q.sentence.s)}</div><p class="question-subtitle">Соберите правильный перевод из слов-кубиков.</p>${renderCubeQuestion(q)}`;break;case"f":h+=`<div class="question-title">Соберите предложение</div><div class="sentence-display">${escapeHTML(q.sentence.sr)}</div><p class="question-subtitle">Составьте предложение на голландском языке.</p>${renderCubeQuestion(q)}`;break;case"g":h+=`<div class="question-title">Вставьте пропущенное слово</div><div class="sentence-display">${escapeHTML(q.gapSentence)}</div><p class="question-subtitle">Перевод пропущенного слова: <strong>${escapeHTML(q.word.ru)}</strong></p>${renderChoices(q)}`;break}$("questionContent").innerHTML=h;if(q.type==="d"){$("repeatSound").addEventListener("click",()=>speak(q.word.nl));setTimeout(()=>speak(q.word.nl),350)}if(q.type==="e"||q.type==="f")renderCubeEvents(q);if(q.type==="c"||q.type==="d"){const input=$("answerInput");input.addEventListener("keydown",e=>{if(e.key==="Enter"&&!q.completed)checkTypedAnswer()});setTimeout(()=>input.focus(),100)}}
+function normalizeTyped(s){return String(s||"").toLocaleLowerCase("nl-NL").normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/[.,!?;:()[\]{}"'«»]/g,"").replace(/^(de|het|een)\s+/i,"").replace(/\s+/g," ").trim()}
+function normalizeCubeAnswer(s){return String(s||"").toLocaleLowerCase().replace(/ё/g,"е").replace(/[.,!?;:()[\]{}"'«»]/g,"").replace(/\s+/g," ").trim()}
+function wrongAttempt(q,message="Неверно. Попробуйте ещё раз."){q.attempts++;if(q.attempts>=3){finishQuestion(q,false);return}$("attemptInfo").textContent=`Попытка ${q.attempts+1} из 3`;$("feedback").className="feedback show bad";$("feedback").textContent=message;if(q.type==="c"||q.type==="d"){const input=$("answerInput");input.classList.remove("input-wrong","shake");void input.offsetWidth;input.classList.add("input-wrong","shake");const text=input.value;setTimeout(()=>{if(!input.isConnected||q.completed)return;input.focus();input.setSelectionRange(text.length,text.length)},30)}if(q.type==="e"||q.type==="f"){const area=$("selectedCubes");area.classList.remove("wrong");void area.offsetWidth;area.classList.add("wrong")}}
+function correctAttempt(q){finishQuestion(q,true)}
+function finishQuestion(q,ok){if(q.completed)return;q.completed=true;q.correct=ok;q.answer=q.word.nl;lesson.answered++;if(ok)lesson.correct++;else lesson.mistakes.push({nl:q.word.nl,ru:q.word.ru,correct:q.word.nl,type:TYPE_NAMES[q.type]});$("attemptInfo").textContent="";const f=$("feedback");f.className="feedback show "+(ok?"good":"bad");f.innerHTML=ok?"✓ Правильно!":`Три попытки использованы.<br>Правильный ответ: <strong>${escapeHTML(q.word.nl)}</strong>`;const input=$("answerInput");if(input){input.disabled=true;input.classList.remove("input-wrong");input.classList.add("input-right")}const area=$("selectedCubes");if(area){area.classList.remove("wrong");if(ok)area.classList.add("correct");area.innerHTML="";if(!ok)area.textContent=q.type==="e"?q.sentence.sr:q.sentence.s}if(["a","b","g"].includes(q.type)){document.querySelectorAll("[data-choice]").forEach(b=>{const i=Number(b.dataset.choice),o=q.options[i];b.disabled=true;if(normalizeWord(o)===normalizeWord(q.word.nl)||(q.type==="a"&&normalizeCubeAnswer(o)===normalizeCubeAnswer(q.word.ru)))b.classList.add("correct")})}speak(["e","f","g"].includes(q.type)?q.sentence.s:q.word.nl);$("correctCounter").textContent=lesson.correct+" верно";const last=lesson.index===lesson.questions.length-1;$("questionAction").innerHTML=`<button class="btn btn-primary" id="nextQuestion">${last?"Показать результат":"Дальше →"}</button>`;$("nextQuestion").addEventListener("click",()=>{if(last)showResults();else{lesson.index++;renderQuestion();window.scrollTo({top:0,behavior:"smooth"})}})}
+function checkTypedAnswer(){const q=lesson?.questions[lesson.index];if(!q||q.completed)return;const input=$("answerInput"),v=input.value;if(!v.trim()){input.focus();return}if(normalizeTyped(v)===normalizeTyped(q.word.nl))correctAttempt(q);else wrongAttempt(q)}
+function checkChoice(i){const q=lesson?.questions[lesson.index];if(!q||q.completed||q.disabledChoices.includes(i))return;const o=q.options[i],ok=q.type==="a"?normalizeCubeAnswer(o)===normalizeCubeAnswer(q.word.ru):normalizeWord(o)===normalizeWord(q.word.nl);if(ok)correctAttempt(q);else{q.disabledChoices.push(i);const b=document.querySelector(`[data-choice="${i}"]`);if(b){b.disabled=true;b.classList.add("wrong")}wrongAttempt(q)}}
+function checkCubeAnswer(){const q=lesson?.questions[lesson.index];if(!q||q.completed||!q.selectedCubes.length)return;const answer=q.selectedCubes.map(c=>c.value).join(" "),correct=q.type==="e"?q.sentence.sr:q.s;if(normalizeCubeAnswer(answer)===normalizeCubeAnswer(correct))correctAttempt(q);else wrongAttempt(q,"Неверный порядок слов. Попробуйте ещё раз.")}
+$("questionContent").addEventListener("click",e=>{const b=e.target.closest("[data-choice]");if(b)checkChoice(Number(b.dataset.choice));if(e.target.id==="checkTyped")checkTypedAnswer()});
+
+function showResults(){if(!lesson)return;$("lessonScreen").classList.add("hidden");$("practiceMenu").classList.add("hidden");$("resultScreen").classList.remove("hidden");const total=lesson.answered,correct=lesson.correct,pct=total?Math.round(correct/total*100):0;$("resultPercent").textContent=pct+"%";$("resultCaption").textContent=`Правильно ${correct} из ${total}`;$("resultMistakes").innerHTML=!lesson.mistakes.length?'<div class="result-success">🎉 Отличная работа!<br>Вы ответили правильно на все вопросы.</div>':'<h3 class="section-title">Слова, над которыми стоит поработать</h3>'+lesson.mistakes.map(m=>`<div class="result-item"><strong>${escapeHTML(m.nl)}</strong>${escapeHTML(m.ru)}<br><span>Тип задания: ${escapeHTML(m.type)}</span></div>`).join("");$("progressFill").style.width="100%";window.scrollTo({top:0,behavior:"smooth"})}
+function returnToMenu(){lesson=null;$("practiceMenu").classList.remove("hidden");$("lessonScreen").classList.add("hidden");$("resultScreen").classList.add("hidden");hideStatus("practiceStatus");renderTopicCheckboxes();window.scrollTo({top:0,behavior:"smooth"})}
+$("retryLesson").addEventListener("click",()=>{if(!lesson)return;const s={...lesson.settings};selectedTopics=[...s.topics];selectedMode=s.mode;questionCount=s.count;updateModeButtons();updateCountButtons();startNewLesson()});
+$("backToMenu").addEventListener("click",returnToMenu);
+function showExitModal(){$("exitModal").classList.add("show")}function closeExitModal(){$("exitModal").classList.remove("show")}
+$("exitLesson").addEventListener("click",showExitModal);$("continueLesson").addEventListener("click",closeExitModal);
+$("finishLesson").addEventListener("click",()=>{closeExitModal();showResults()});
+$("quitLesson").addEventListener("click",()=>{closeExitModal();lesson=null;$("lessonScreen").classList.add("hidden");$("resultScreen").classList.add("hidden");$("practiceMenu").classList.remove("hidden");window.scrollTo({top:0,behavior:"smooth"})});
+$("exitModal").addEventListener("click",e=>{if(e.target===$("exitModal"))closeExitModal()});
+function updateModeButtons(){document.querySelectorAll("[data-mode]").forEach(b=>b.classList.toggle("active",b.dataset.mode===selectedMode))}
+function updateCountButtons(){document.querySelectorAll("[data-count]").forEach(b=>b.classList.toggle("active",Number(b.dataset.count)===questionCount))}
+$("modeOptions").addEventListener("click",e=>{const b=e.target.closest("[data-mode]");if(b){selectedMode=b.dataset.mode;updateModeButtons()}});
+$("numberOptions").addEventListener("click",e=>{const b=e.target.closest("[data-count]");if(b){questionCount=Number(b.dataset.count);updateCountButtons()}});
+$("startLesson").addEventListener("click",startNewLesson);
+renderThemeHints();renderTopicCheckboxes();renderWords();updateModeButtons();updateCountButtons();
+$("practiceMenu").classList.remove("hidden");$("lessonScreen").classList.add("hidden");$("resultScreen").classList.add("hidden");
+if("speechSynthesis"in window){window.speechSynthesis.getVoices();window.speechSynthesis.onvoiceschanged=()=>window.speechSynthesis.getVoices()}
+})();
+</script>
+</body>
+</html>
